@@ -7,7 +7,7 @@
 read -rp "shared folder on the NFS server (full path): " choice; export NFS_FOLDER=$choice; echo $NFS_FOLDER;
 read -rp "How many servers will be accessing (integer): " choice; export NUMBER=$choice;
 
-for i in `seq 1 $NUMBER`; do read -rp "IP of the connecting server ("$NUMBER"): " choice; export NFS_IP$NUMBER=$choice; done
+for i in `seq 1 $NUMBER`; do read -rp "IP of the connecting server ("$i"): " choice; export NFS_IP$i=$choice; done
 
 yum -y install nfs-utils libnfsidmap 
 
@@ -21,7 +21,7 @@ systemctl start nfs-idmapd
 mkdir $NFS_FOLDER
 chmod 777 $NFS_FOLDER
 
-for i in `seq 1 $NUMBER`; do echo -e "$NFS_FOLDER\t$NFS_IP$NUMBER(rw,sync,all_squash)" >> /etc/exports; done
+for i in `seq 1 $NUMBER`; do echo -e "$NFS_FOLDER\t$NFS_IP$i(rw,sync,all_squash)" >> /etc/exports; done
 exportfs -r
 
 showmount -e [$NFS_IP]
