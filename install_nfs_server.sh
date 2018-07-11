@@ -4,8 +4,8 @@
 # This script is used to install/setup NFS clients on a fresh CentOS 7 with only the following performed:
 # yum -y update; reboot
 
-read -rp "shared folder on the NFS server (full path): " choice; export NFS_FOLDER=$choice; echo $NFS_FOLDER;
-read -rp "How many servers will be accessing (integer): " choice; export NUMBER=$choice;
+read -rp "shared folder on the NFS server (full path): " choice; export NFS_FOLDER=$choice
+read -rp "How many servers will be accessing (integer): " choice; export NUMBER=$choice
 
 for i in `seq 1 $NUMBER`; do read -rp "IP of the connecting server ("$i"): " choice; export NFS_IP$i=$choice; done
 
@@ -24,4 +24,4 @@ chmod 777 $NFS_FOLDER
 for i in `seq 1 $NUMBER`; do echo -e "$NFS_FOLDER\t$NFS_IP$i(rw,sync,all_squash)" >> /etc/exports; done
 exportfs -r
 
-showmount -e [$NFS_IP]
+showmount -e localhost
