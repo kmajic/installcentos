@@ -28,12 +28,18 @@ chmod 777 $NFS_FOLDER
 for i in `cat /root/temp_file.ip`; do echo -e "$NFS_FOLDER\t$i(rw,sync,all_squash)" >> /etc/exports; done
 rm -f /root/temp_file.ip
 
-systemctl unmask firewalld
-systemctl enable firewalld
-systemctl restart firewalld
+##### opening the port 2049 in the firewall #######
 
-firewall-cmd --permanent --add-port=2049/tcp
-firewall-cmd --reload
+### below works if firewalld is running over iptables. However, I commented it out and edited itpables directly
+#systemctl unmask firewalld
+#systemctl enable firewalld
+#systemctl restart firewalld
+#firewall-cmd --permanent --add-port=2049/tcp
+#firewall-cmd --reload
+
+sed -i s'/-A INPUT -i lo -j ACCEPT/-A INPUT -i lo -j ACCEPT\n-A INPUT -p tcp -m state --state NEW -m tcp --dport 2049 -j ACCEPT/' /etc/sysconfig/iptables
+systemctl restart iptables
+###################################################
 
 exportfs -r
 
