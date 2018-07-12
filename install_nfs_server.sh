@@ -28,6 +28,10 @@ chmod 777 $NFS_FOLDER
 for i in `cat /root/temp_file.ip`; do echo -e "$NFS_FOLDER\t$i(rw,sync,all_squash)" >> /etc/exports; done
 rm -f /root/temp_file.ip
 
+systemctl unmask firewalld
+systemctl enable firewalld
+systemctl restart firewalld
+
 firewall-cmd --permanent --add-port=2049/tcp
 firewall-cmd --reload
 
