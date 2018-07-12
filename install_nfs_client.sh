@@ -12,3 +12,4 @@ systemctl enable rpcbind; systemctl start rpcbind
 
 mkdir $NFS_FOLDER
 echo -e "$NFS_IP:$NFS_FOLDER\t$NFS_FOLDER\t nfs \t defaults \t 0 0" >> /etc/fstab; mount -a
+df -hT
