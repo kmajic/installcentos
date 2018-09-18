@@ -154,6 +154,13 @@ if [ ! -z "${HTTPS_PROXY:-${https_proxy:-${HTTP_PROXY:-${http_proxy}}}}" ]; then
 	echo "openshift_no_proxy=\"${__no_proxy}\"" >> inventory.ini
 fi
 
+
+read -rp "Do you wish to deploy Openshift to this single machine? (YES to proceed) " choice;
+if [ "$choice" != "YES" ] ; then
+	echo "Stopping the script execution. Please edit the Ansible inventories and proceed manually."
+	exit 1;
+fi
+
 ansible-playbook -i inventory.ini openshift-ansible/playbooks/prerequisites.yml
 ansible-playbook -i inventory.ini openshift-ansible/playbooks/deploy_cluster.yml
 
