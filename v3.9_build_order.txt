@@ -1,0 +1,53 @@
+subscription-manager register --username=<user_name> --password=<password>
+subscription-manager refresh
+subscription-manager list --available --matches '*OpenShift*'
+subscription-manager attach --pool=<pool_id>
+subscription-manager repos --disable="*"
+yum repolist
+subscription-manager repos \
+    --enable="rhel-7-server-rpms" \
+    --enable="rhel-7-server-extras-rpms" \
+    --enable="rhel-7-server-ose-3.9-rpms" \
+    --enable="rhel-7-fast-datapath-rpms" \
+    --enable="rhel-7-server-ansible-2.4-rpms"
+yum install -y wget git net-tools bind-utils yum-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct screen vim
+yum update -y 
+systemctl reboot
+yum install atomic-openshift-utils
+yum install docker-1.13.1
+
+# systemctl enable docker
+# systemctl start docker
+# systemctl is-active docker
+
+$ yum install atomic
+
+htpasswd, touch, mkdir -p
+
+
+=================
+-bash-4.1# cat ansible.modified
+[masters]
+ose3-master[1:3].test.example.com
+[etcd]
+ose3-master[1:3].test.example.com
+[nodes]
+ose3-master[1:3].test.example.com
+ose3-infra[1:2].test.example.com
+ose3-node[1:2].test.example.com
+[nfs]
+ose3-master1.test.example.com
+[lb]
+ose3-lb.test.example.com
+[OSEv3:children]
+masters
+nodes
+etcd
+lb
+nfs
+[OSEv3:vars]
+ansible_user=root
+openshift_deployment_type=origin
+openshift_master_default_subdomain=apps.test.example.com
+openshift_master_cluster_hostname=ose3-lb.test.example.com
+debug_level=2
