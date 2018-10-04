@@ -1,0 +1,105 @@
+https://docs.openshift.com/container-platform/3.10/install/host_preparation.html
+https://docs.openshift.com/container-platform/3.10/install/running_install.html#running-the-advanced-installation-individual-components
+
+subscription-manager list --available --matches '*OpenShift*'
+	// attach a pool that contains Openshift Container Platform
+subscription-manager attach --pool=pool_id
+subscription-manager repos --disable=*
+subscription-manager repos \
+    --enable="rhel-7-server-rpms" \
+    --enable="rhel-7-server-extras-rpms" \
+    --enable="rhel-7-server-ose-3.10-rpms" \
+    --enable="rhel-7-server-ansible-2.4-rpms"
+
+// make sure all those repos are enabled on ALL nodes!!
+
+yum install -y wget traceroute iputils git net-tools bind-utils yum-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct vim screen docker-1.13.1 openshift-ansible atomic
+yum update -y
+systemctl restart docker; systemctl enable docker; systemctl status docker
+systemctl reboot
+
+// clone new nodes now if needed
+
+ssh-keygen -q -f ~/.ssh/id_rsa -N ""
+
+for host in \
+    192.168.56.104 \
+    192.168.56.110 \
+	192.168.56.105 \
+    192.168.56.106; \
+    do ssh-copy-id -i ~/.ssh/id_rsa.pub $host; \
+	done
+
+edit /etc/hosts	on all nodes
+
+// test keyless SSH connections to all nodes
+	ssh 192.168.56.102
+// or
+	ansible -i inventory.ini nodes -m ping
+
+mkdir -p /etc/origin/master; touch /etc/origin/master/htpasswd; ls -lha /etc/origin/master/htpasswd
+
+ansible-playbook -i inventory.ini /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+ansible-playbook -i inventory.ini /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+
+htpasswd -b /etc/origin/master/htpasswd ${USERNAME} ${PASSWORD}
+oc adm policy add-cluster-role-to-user cluster-admin ${USERNAME}
+
+
+//#################### USEFUL STUFF ##################
+
+yum-config-manager --disable \*
+
+subscription-manager register --force
+subscription-manager attach --pool=8a85f99965c8ca6e0165f772a4620f55
+
+//### clone kmajic/installcentos git repo
+//### copy the SSH key to nodes
+
+yum update -y; yum install -y  wget git vim screen net-tools docker-1.13.1 openshift-ansible bind-utils yum-utils iptables-services bridge-utils bash-completion kexec-tools 
+sos psacct openssl-devel httpd-tools NetworkManager python-cryptography python2-pip python-devel python-passlib java-1.8.0-openjdk-headless
+ "@Development Tools"
+ 
+ ///////////////////////////////////  offline installation ///// docker images
+ 
+scp /var/www/html/repos/images/ose3-images.tar root@<openshift_host_name>:
+ssh root@<openshift_host_name> "docker load -i ose3-images.tar"
+
+////////////////////////
+execute install_openshift.sh
+modify Ansible inventory (openshift-enterprise != origin)
+export DOMAIN, API_PORT, VERSION (3.10)
+ansible -i installcentos/inventory.ini nodes -m ping
+htpasswd -c /etc/origin/master/htpasswd admin
+
+159  yum install atomic-openshift-clients
+  160  yum remove origin-clients
+  161  yum remove origin origin-node
+  163  yum remove origin-hyperkube
+  172  yum install atomic-openshift-node
+  
+yum install -y atomic-openshift-node
+
+
+
+???
+profit
+
+192.168.56.101 master
+192.168.56.102 infra
+192.168.56.103 n1
+192.168.56.104 n2
+
+[nodes]
+master.example.com openshift_node_group_name='node-config-master'
+node1.example.com openshift_node_group_name='node-config-compute'
+node1.example.com openshift_node_group_name='node-config-compute'
+infra-node1.example.com openshift_node_group_name='node-config-infra'
+infra-node2.example.com openshift_node_group_name='node-config-infra'
+
+
+cd /tmp
+wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+ls *.rpm
+yum install epel-release-latest-7.noarch.rpm
+====================================
