@@ -1,0 +1,20 @@
+[RHEL7-HTTP-UpdateServer]
+name=Red Hat Enterprise Linux 7.2
+baseurl=http://10.144.28.156/repo
+enabled=1
+gpgcheck=0
+gpgkey=
+
+subscription-manager config
+      --server.proxy_hostname=proxy.example.com
+      --server.proxy_port=8080
+      --server.proxy_user=admin
+      --server.proxy_password=secret
+      
+[root@janhrvocpma ~]# grep proxy /etc/yum.conf
+proxy=http://example.com:8080
+proxy_username=USER
+proxy_password=PASS
+
+[root@janhrvocpma ~]# cat /etc/environment
+http_proxy=http://user:pass@192.168.101.100:8080/
