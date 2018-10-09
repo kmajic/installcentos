@@ -1,0 +1,183 @@
+[OSEv3:children]
+masters
+nodes
+etcd
+
+[masters]
+janhrvOCPma openshift_ip=10.144.20.50 openshift_schedulable=true
+
+[etcd]
+janhrvOCPinfra openshift_ip=10.144.20.48
+
+[nodes]
+janhrvOCPma openshift_ip=10.144.20.50 openshift_schedulable=true openshift_node_group_name="node-config-master-infra"
+janhrvOCPinfra openshift_ip=10.144.20.48 openshift_schedulable=true openshift_node_group_name="node-config-infra"
+janhrvOCPn01 openshift_ip=10.144.20.51 openshift_schedulable=true openshift_node_group_name="node-config-compute"
+janhrvOCPn02 openshift_ip=10.144.20.49 openshift_schedulable=true openshift_node_group_name="node-config-compute"
+
+[OSEv3:vars]
+ansible_ssh_user=root
+openshift_disable_check=disk_availability,docker_storage,memory_availability
+openshift_deployment_type=openshift-enterprise
+
+enable_excluders=False
+enable_docker_excluder=False
+ansible_service_broker_install=False
+template_service_broker_install=false
+openshift_cluster_monitoring_operator_install=false
+
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+openshift_master_htpasswd_file='/etc/origin/master/htpasswd'
+
+openshift_public_hostname=console.openshift.zaba.hr
+openshift_master_default_subdomain=apps.openshift.zaba.hr
+openshift_master_api_port=8443
+openshift_master_console_port=8443
+
+openshift_http_proxy=http://proxyasg.zbo:8080
+openshift_https_proxy=http://proxyasg.zbo:8080
+openshift_docker_options="--insecure-registry 172.17.0.1/16"
+openshift_no_proxy=localhost,janhrvOCPma,janhrvOCPinfra,janhrvOCPn01,janhrvOCPn02,10.144.20.48,10.144.20.49,10.144.20.50,10.144.20.51,172.17.0.1/16
+
+
+##################################################################################################
+##################################################################################################
+
+
+[root@janhrvocpma ~]# oc version
+oc v3.10.45
+kubernetes v1.10.0+b81c8f8
+features: Basic-Auth GSSAPI Kerberos SPNEGO
+Unable to connect to the server: Service Unavailable
+
+##################################################################################################
+
+[root@janhrvocpma ~]# oc version
+oc v3.10.45
+kubernetes v1.10.0+b81c8f8
+features: Basic-Auth GSSAPI Kerberos SPNEGO
+
+Server https://janhrvocpma.zaba.hr:8443
+openshift v3.10.45
+kubernetes v1.10.0+b81c8f8
+
+##################################################################################################
+##################################################################################################
+
+[root@janhrvocpma ~]# ansible-playbook -i inventory.ini /usr/share/ansible/openshift-ansible/playbooks/openshift-master/config.yml -vvv
+(...)
+
+TASK [openshift_control_plane : Wait for control plane pods to appear] ****************************************************************************************************************************************
+task path: /usr/share/ansible/openshift-ansible/roles/openshift_control_plane/tasks/main.yml:167
+
+Using module file /usr/share/ansible/openshift-ansible/roles/lib_openshift/library/oc_obj.py
+<janhrvOCPma> ESTABLISH SSH CONNECTION FOR USER: root
+<janhrvOCPma> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f janhrvOCPma '/bin/sh -c '"'"'echo ~ && sleep 0'"'"''
+<janhrvOCPma> (0, '/root\n', '')
+<janhrvOCPma> ESTABLISH SSH CONNECTION FOR USER: root
+<janhrvOCPma> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f janhrvOCPma '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /root/.ansible/tmp/ansible-tmp-1539096166.08-57693985782638 `" && echo ansible-tmp-1539096166.08-57693985782638="` echo /root/.ansible/tmp/ansible-tmp-1539096166.08-57693985782638 `" ) && sleep 0'"'"''
+<janhrvOCPma> (0, 'ansible-tmp-1539096166.08-57693985782638=/root/.ansible/tmp/ansible-tmp-1539096166.08-57693985782638\n', '')
+<janhrvOCPma> PUT /tmp/tmpPRgOid TO /root/.ansible/tmp/ansible-tmp-1539096166.08-57693985782638/oc_obj.py
+<janhrvOCPma> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f '[janhrvOCPma]'
+<janhrvOCPma> (0, 'sftp> put /tmp/tmpPRgOid /root/.ansible/tmp/ansible-tmp-1539096166.08-57693985782638/oc_obj.py\n', '')
+<janhrvOCPma> ESTABLISH SSH CONNECTION FOR USER: root
+<janhrvOCPma> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f janhrvOCPma '/bin/sh -c '"'"'chmod u+x /root/.ansible/tmp/ansible-tmp-1539096166.08-57693985782638/ /root/.ansible/tmp/ansible-tmp-1539096166.08-57693985782638/oc_obj.py && sleep 0'"'"''
+<janhrvOCPma> (0, '', '')
+<janhrvOCPma> ESTABLISH SSH CONNECTION FOR USER: root
+<janhrvOCPma> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentication=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f -tt janhrvOCPma '/bin/sh -c '"'"'/usr/bin/python /root/.ansible/tmp/ansible-tmp-1539096166.08-57693985782638/oc_obj.py; rm -rf "/root/.ansible/tmp/ansible-tmp-1539096166.08-57693985782638/" > /dev/null 2>&1 && sleep 0'"'"''
+<janhrvOCPma> (0, '\r\n{"msg": {"returncode": 1, "cmd": "/usr/bin/oc get pod master-__omit_place_holder__235da7a377d6beb8afad7d6df94fcf2af0eb042e-janhrvocpma -o json -n kube-system", "results": [{}], "stderr": "Unable to connect to the server: proxyconnect tcp: dial tcp: lookup http on 10.144.20.50:53: no such host\\n", "stdout": ""}, "failed": true, "exception": "  File \\"/tmp/ansible_LPk4I1/ansible_module_oc_obj.py\\", line 47, in <module>\\n    import ruamel.yaml as yaml\\n", "changed": false, "invocation": {"module_args": {"files": null, "kind": "pod", "force": false, "all_namespaces": null, "field_selector": null, "namespace": "kube-system", "delete_after": false, "kubeconfig": "/etc/origin/master/admin.kubeconfig", "content": null, "state": "list", "debug": false, "selector": null, "name": "master-__omit_place_holder__235da7a377d6beb8afad7d6df94fcf2af0eb042e-janhrvocpma"}}}\r\n', 'Shared connection to janhrvocpma closed.\r\n')
+FAILED - RETRYING: Wait for control plane pods to appear (59 retries left).Result was: {
+    "attempts": 2,
+    "changed": false,
+    "failed": true,
+    "invocation": {
+        "module_args": {
+            "all_namespaces": null,
+            "content": null,
+            "debug": false,
+            "delete_after": false,
+            "field_selector": null,
+            "files": null,
+            "force": false,
+            "kind": "pod",
+            "kubeconfig": "/etc/origin/master/admin.kubeconfig",
+            "name": "master-__omit_place_holder__235da7a377d6beb8afad7d6df94fcf2af0eb042e-janhrvocpma",
+            "namespace": "kube-system",
+            "selector": null,
+            "state": "list"
+        }
+    },
+    "msg": {
+        "cmd": "/usr/bin/oc get pod master-__omit_place_holder__235da7a377d6beb8afad7d6df94fcf2af0eb042e-janhrvocpma -o json -n kube-system",
+        "results": [
+            {}
+        ],
+        "returncode": 1,
+        "stderr": "Unable to connect to the server: proxyconnect tcp: dial tcp: lookup http on 10.144.20.50:53: no such host\n",
+        "stdout": ""
+    },
+    "retries": 61
+
+	====================
+	
+TASK [openshift_control_plane : Wait for control plane pods to appear] ****************************************************************************************************************************************
+task path: /usr/share/ansible/openshift-ansible/roles/openshift_control_plane/tasks/main.yml:167
+Using module file /usr/share/ansible/openshift-ansible/roles/lib_openshift/library/oc_obj.py
+<janhrvOCPma> ESTABLISH SSH CONNECTION FOR USER: root
+<janhrvOCPma> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentic
+ation=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f janhrvOCPma '/bin/sh -c '"'"'echo ~ && sleep 0'"'"''
+<janhrvOCPma> (0, '/root\n', '')
+<janhrvOCPma> ESTABLISH SSH CONNECTION FOR USER: root
+<janhrvOCPma> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentic
+ation=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f janhrvOCPma '/bin/sh -c '"'"'( umask 77 && mkdir -p "` echo /root/.ansible/tmp/ansible-tmp-1539096436.31-86091588009431
+`" && echo ansible-tmp-1539096436.31-86091588009431="` echo /root/.ansible/tmp/ansible-tmp-1539096436.31-86091588009431 `" ) && sleep 0'"'"''
+<janhrvOCPma> (0, 'ansible-tmp-1539096436.31-86091588009431=/root/.ansible/tmp/ansible-tmp-1539096436.31-86091588009431\n', '')
+<janhrvOCPma> PUT /tmp/tmpUb0amV TO /root/.ansible/tmp/ansible-tmp-1539096436.31-86091588009431/oc_obj.py
+<janhrvOCPma> SSH: EXEC sftp -b - -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAut
+hentication=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f '[janhrvOCPma]'
+<janhrvOCPma> (0, 'sftp> put /tmp/tmpUb0amV /root/.ansible/tmp/ansible-tmp-1539096436.31-86091588009431/oc_obj.py\n', '')
+<janhrvOCPma> ESTABLISH SSH CONNECTION FOR USER: root
+<janhrvOCPma> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentic
+ation=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f janhrvOCPma '/bin/sh -c '"'"'chmod u+x /root/.ansible/tmp/ansible-tmp-1539096436.31-86091588009431/ /root/.ansible/tmp/a
+nsible-tmp-1539096436.31-86091588009431/oc_obj.py && sleep 0'"'"''
+<janhrvOCPma> (0, '', '')
+<janhrvOCPma> ESTABLISH SSH CONNECTION FOR USER: root
+<janhrvOCPma> SSH: EXEC ssh -C -o ControlMaster=auto -o ControlPersist=60s -o KbdInteractiveAuthentication=no -o PreferredAuthentications=gssapi-with-mic,gssapi-keyex,hostbased,publickey -o PasswordAuthentic
+ation=no -o User=root -o ConnectTimeout=10 -o ControlPath=/root/.ansible/cp/68434ad95f -tt janhrvOCPma '/bin/sh -c '"'"'/usr/bin/python /root/.ansible/tmp/ansible-tmp-1539096436.31-86091588009431/oc_obj.py;
+rm -rf "/root/.ansible/tmp/ansible-tmp-1539096436.31-86091588009431/" > /dev/null 2>&1 && sleep 0'"'"''
+<janhrvOCPma> (0, '\r\n{"msg": {"returncode": 1, "cmd": "/usr/bin/oc get pod master-__omit_place_holder__2dfaf6257ec3c9f60a0181ca847658143860a8bf-janhrvocpma -o json -n kube-system", "results": [{}], "stderr
+": "Unable to connect to the server: proxyconnect tcp: dial tcp: lookup http on 10.144.20.50:53: no such host\\n", "stdout": ""}, "failed": true, "exception": "  File \\"/tmp/ansible_prtYkI/ansible_module_oc
+_obj.py\\", line 47, in <module>\\n    import ruamel.yaml as yaml\\n", "changed": false, "invocation": {"module_args": {"files": null, "kind": "pod", "force": false, "all_namespaces": null, "field_selector":
+ null, "namespace": "kube-system", "delete_after": false, "kubeconfig": "/etc/origin/master/admin.kubeconfig", "content": null, "state": "list", "debug": false, "selector": null, "name": "master-__omit_place
+_holder__2dfaf6257ec3c9f60a0181ca847658143860a8bf-janhrvocpma"}}}\r\n', 'Shared connection to janhrvocpma closed.\r\n')
+FAILED - RETRYING: Wait for control plane pods to appear (60 retries left).Result was: {
+    "attempts": 1,
+    "changed": false,
+    "failed": true,
+    "invocation": {
+        "module_args": {
+            "all_namespaces": null,
+            "content": null,
+            "debug": false,
+            "delete_after": false,
+            "field_selector": null,
+            "files": null,
+            "force": false,
+            "kind": "pod",
+            "kubeconfig": "/etc/origin/master/admin.kubeconfig",
+            "name": "master-__omit_place_holder__2dfaf6257ec3c9f60a0181ca847658143860a8bf-janhrvocpma",
+            "namespace": "kube-system",
+            "selector": null,
+            "state": "list"
+        }
+    },
+    "msg": {
+        "cmd": "/usr/bin/oc get pod master-__omit_place_holder__2dfaf6257ec3c9f60a0181ca847658143860a8bf-janhrvocpma -o json -n kube-system",
+        "results": [
+            {}
+        ],
+        "returncode": 1,
+        "stderr": "Unable to connect to the server: proxyconnect tcp: dial tcp: lookup http on 10.144.20.50:53: no such host\n",
+        "stdout": ""
+    },
+    "retries": 61
