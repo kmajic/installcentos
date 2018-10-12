@@ -3,8 +3,9 @@ https://docs.openshift.com/container-platform/3.10/install/running_install.html#
 
 subscription-manager list --available --matches '*OpenShift*'
 	// attach a pool that contains Openshift Container Platform
-subscription-manager attach --pool=pool_id
-subscription-manager repos --disable=*
+subscription-manager attach --pool=
+
+subscription-manager repos --disable=*; \
 subscription-manager repos \
     --enable="rhel-7-server-rpms" \
     --enable="rhel-7-server-extras-rpms" \
@@ -13,14 +14,19 @@ subscription-manager repos \
 
 // make sure all those repos are enabled on ALL nodes!!
 
-yum install -y wget traceroute iputils git net-tools bind-utils yum-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct vim screen docker-1.13.1 openshift-ansible atomic
+yum install -y wget tee pinfo locate traceroute iputils git net-tools bind-utils yum-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct vim screen docker-1.13.1 openshift-ansible atomic
 yum update -y
 systemctl restart docker; systemctl enable docker; systemctl status docker
+updatedb
+	// if using locate
 systemctl reboot
+
 
 // clone new nodes now if needed
 
 ssh-keygen -q -f ~/.ssh/id_rsa -N ""
+
+ssh-copy-id -i ~/.ssh/id_rsa.pub $(hostname)
 
 for host in \
     192.168.56.104 \
@@ -31,6 +37,11 @@ for host in \
 	done
 
 edit /etc/hosts	on all nodes
+
+echo "$(hostname -I | awk '{print $2}') $(hostname) console.ocptest.com console apps.ocptest.com apps" >> /etc/hosts
+	//on master
+echo "$(hostname -I | awk '{print $2}') $(hostname)" >> /etc/hosts
+	// on nodes
 
 // test keyless SSH connections to all nodes
 	ssh 192.168.56.102
@@ -43,10 +54,20 @@ ansible-playbook -i inventory.ini /usr/share/ansible/openshift-ansible/playbooks
 ansible-playbook -i inventory.ini /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
 
 htpasswd -b /etc/origin/master/htpasswd ${USERNAME} ${PASSWORD}
+htpasswd -b /etc/origin/master/htpasswd admin admin
 oc adm policy add-cluster-role-to-user cluster-admin ${USERNAME}
+oc adm policy add-cluster-role-to-user cluster-admin admin
+
+
+oc adm diagnostics
+oc adm registry
 
 
 //#################### USEFUL STUFF ##################
+
+echo '{ "insecure-registries": ["172.30.0.0/16"] }' > /etc/docker/daemon.json
+systemctl daemon-reload
+systemctl restart docker
 
 yum-config-manager --disable \*
 
